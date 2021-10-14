@@ -1,0 +1,89 @@
+<odoo>
+    <data>
+
+        <!-- PO Form View -->
+        <record id="custom_purchase_view_form" model="ir.ui.view">
+            <field name="name">custom.purchase.order.form</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_ref']" position="after">
+                    <field name="sj_luar"/>
+                    <field name="delivery_status" attrs="{'invisible': [('sj_luar','=',False)]}"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='products']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('sj_luar','=',True)]}</attribute>
+                </xpath>
+                <xpath expr="//notebook/page[@name='purchase_delivery_invoice']" position="before">
+                    <page string="Surat Jalan Luar" attrs="{'invisible': [('sj_luar','=',False)]}">
+                    <!-- <page string="Surat Jalan Luar"  attrs="{'invisible':['&',('sj_luar','=',False),('products','=',True)]}"> -->
+                        <field name="sjl_line" widget="section_and_note_one2many" mode="tree,kanban">
+                            <tree string="Surat Jalan Luar" editable="bottom">
+                                <control>
+                                    <create name="add_product_control" string="Add a product"/>
+                                </control>
+                                <field name="product_id" string="Product"/>
+                                <field name="name" string="Description"/>
+                                <field name="product_category" string="Category"/>
+                                <field name="product_qty" string="Quantity"/>
+                                <field name="finishing" string="Finishing"/>
+                                <field name="sides" string="Sides"/>
+                                <field name="ukuran" string="Ukuran(PxL)"/>
+                                <field name="jml_druk" string="Jml Druk"/>
+                                <field name="qty_received"/>
+                                <field name="unit" string="Unit"/>
+                            </tree>
+                        </field>
+                        <field name="notes" class="oe_inline" placeholder="Define your terms and conditions ..."/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- PO Tree view -->
+        <record id="custom_purchase_view_tree" model="ir.ui.view">
+            <field name="name">custom.purchase.order.tree</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="date_approve"/>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='activity_ids']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='amount_total']" position="before">
+                    <field name="amount_untaxed"/>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="invoice_status"/>
+                    <field name="sj_luar" string="SJ Luar"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Filter purchase -->
+        <record id="view_filter_purchase_order_done" model="ir.ui.view">
+            <field name="name">purchase.order.done.filter</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+            <field name="arch" type="xml">
+        
+                <xpath expr="//filter[@name='draft']" position="before">
+                    <separator/>
+                    <filter string="Bukan SJ Luar" name="bukan_sjl" domain="[('sj_luar','=',False)]"/>
+                    <filter string="SJ Luar" name="sjl" domain="[('sj_luar','!=',False)]"/>
+                    <separator/>
+                </xpath>
+                    
+            </field>
+        </record>
+
+    </data>
+</odoo>

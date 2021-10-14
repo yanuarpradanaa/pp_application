@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <report
+            id="report_do" 
+            model="stock.picking"
+            string="Surat Jalan PP" 
+            report_type="qweb-html"
+            name="pp_application.do_report"
+            file="pp_application.do_report"/>
+
+        <record id="paperformat_do" model="report.paperformat">
+            <field name="name">SJ PP</field>
+            <field name="default" eval="True"/>
+            <field name="format">A5</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">4</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">3</field>
+        </record>
+
+        <record id="pp_application.report_do" model="ir.actions.report">
+            <field name="paperformat_id" ref="pp_application.paperformat_do"/>
+            <field name="print_report_name">('DO_PP_'+(object.name or '').replace('/','')+'.pdf')</field>
+        </record>
+    
+    </data>
+    
+
+</odoo>

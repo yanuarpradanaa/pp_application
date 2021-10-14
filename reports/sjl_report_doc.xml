@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<odoo>
+        <template id="pp_application.sjl_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="pp_application.sjl_report_doc" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+        <template id="report_assets_common_custom_fonts" name="Custom QWeb fonts" inherit_id="web.report_assets_common">
+                <xpath expr="." position="inside">
+                    <link href="/pp_application/static/src/less/fonts.less" rel="stylesheet" type="text/less"/>
+                </xpath>
+        </template>
+
+        <template id="pp_application.sjl_report_doc">
+            <t t-name="pp_application.sjl_report_doc">
+
+                <t t-call="web.external_layout">
+                    <t t-set="doc" t-value="doc.with_context(lang=lang)"/>
+
+                    <div class="page" style="font-family: Consolas; font-size: 14px !important;">
+                    
+                        <div class="oe_structure"/>
+                        
+                        <div class="row mt32 mb32">
+                            <div class="col-8" name="company_address">
+                                <span>Alamat Pengiriman :</span>
+                                <br/>
+                                <span>CV. Prima Print</span>
+                                <br/>
+                                <span>Jl. Petemon III No.52</span>
+                                <br/>
+                                <span>Surabaya 60252</span>
+                            </div>
+                            <div class="col-4 pull-right">
+                                <span>Vendor/Customer :</span>
+                                <div t-if="doc.dest_address_id">
+                                    <div t-field="doc.dest_address_id"
+                                        t-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": True}'/> <!-- , "phone_icons": True -->
+                                </div>
+
+                                <div t-if="not doc.dest_address_id and doc.picking_type_id and doc.picking_type_id.warehouse_id">
+                                    <span t-field="doc.picking_type_id.warehouse_id.name"/>
+                                    <div t-field="doc.picking_type_id.warehouse_id.partner_id"
+                                        t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True}'/> <!-- , "phone_icons": True -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-5 mb-2" style="margin-top:5px !important;">
+                                <h3 t-if="doc.state != 'draft'" class="consola-font"><strong>
+                                    <br/>
+                                    Surat Jalan#<span t-field="doc.name"/>
+                                </strong></h3>
+                                <h3 t-if="doc.state == 'draft'" class="consola-font"><strong>
+                                    <br/>
+                                    RFQ#<span t-field="doc.name"/>
+                                </strong></h3>
+                            </div>
+                        </div>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+
+                                    <th style="font-weight: normal;">Tanggal Order</th>
+                                    <th style="font-weight: normal;">Status Pengiriman</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span t-field="doc.date_order" widget="date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.delivery_status"/>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <!--<th style="font-weight: normal;">Produk</th>-->
+                                    <th style="font-weight: normal;">Kategori</th>
+                                    <th style="font-weight: normal;">Deskripsi</th>
+                                    <th style="font-weight: normal;">Finishing</th>
+                                    <th style="font-weight: normal;">Sisi</th>
+
+                                    <th style="font-weight: normal;" class="text-center">Ukuran</th>
+                                    <th style="font-weight: normal;" class="text-right">Jumlah Pesanan</th>
+                                    </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.sjl_line" t-as="line">
+                                    <!--<td style="border: none;">-->
+                                        <!--<span t-field="line.product_id.name"/>-->
+                                    <!--</td>-->
+                                    <td style="border: none;">
+                                        <span t-field="line.product_category"/>
+                                    </td>
+                                    <td style="border: none;">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td style="border: none;">
+                                        <span t-field="line.finishing"/>
+                                    </td>
+                                    <td style="border: none;">
+                                        <span t-field="line.sides"/>
+                                    </td>
+
+                                    <td style="border: none;" class="text-center">
+                                        <span t-field="line.ukuran" widget="date"/>
+                                    </td>
+                                    <td style="border: none;" class="text-right">
+                                        <span t-field="line.product_qty"/>
+                                        <span t-field="line.unit"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row" style="margin:0px 15px 5px 15px" >
+                            <div class="col-8">
+                                <table>
+                                    <tr><td width="5px"/>
+                                        <td width="150px" align="center">Penerima,</td>
+                                        <td width="5px"/>
+                                    </tr>
+                                    <tr><td><br/><br/></td></tr>
+                                    <tr><td>(</td>
+                                        <td align="center" style="font-size: 14px !important;">.................</td>
+                                        <td>)</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-4 pull-right">
+                                <table>
+                                    <tr><td width="5px"/>
+                                        <td width="150px" align="center">CV Prima Print,</td>
+                                        <td width="5px"/>
+                                    </tr>
+                                    <tr><td><br/><br/></td></tr>
+                                    <tr><td>(</td>
+                                        <td align="center" style="font-size: 14px !important;">.................</td>
+                                        <td>)</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="oe_structure"/>
+                    
+                    </div>
+                </t>
+            </t>
+        </template>
+
+</odoo>

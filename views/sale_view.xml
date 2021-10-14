@@ -1,0 +1,152 @@
+<odoo>
+    <data>
+
+        <!-- SO dan QO Form View -->
+        <record id="custom_sale_view_form" model="ir.ui.view">
+            <field name="name">custom.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <!-- <xpath expr="//field[@name='payment_term_id']" position="after">
+                    <field name="dicek" attrs="{'invisible': [('order_sequence','=',True)]}" string="Sudah dicek?"/>
+                </xpath> -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="is_done"/>
+                </xpath>
+                <xpath expr="//field[@name='date_order']" position="after">
+                    <field name="kalk_date"/>
+                </xpath>
+                <!-- <xpath expr="//field[@name='note']" position="attributes">
+                    <attribute name="placeholder"></attribute>
+                </xpath> -->
+                <!-- <field name="note"/> -->
+                <xpath expr="//field[@name='order_line']/form/label[@for='name']" position="before">
+                    <label for="specification"/>
+                    <field name="specification"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
+                    <field name="specification"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- SO Tree view -->
+        <record id="custom_sale_view_tree" model="ir.ui.view">
+            <field name="name">custom.sale.order.tree</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_status']" position="after">
+                    <field name="is_done"/>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='activity_ids']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- QO Tree view -->
+        <record id="custom_quotation_view_tree" model="ir.ui.view">
+            <field name="name">custom.quotation.order.tree</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+            <field name="arch" type="xml">
+                <!-- <xpath expr="//field[@name='state']" position="after">
+                    <field name="dicek" string="Sudah dicek?"/>
+                </xpath> -->
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="tag_ids"/>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='activity_ids']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="view_filter_sale_order_done" model="ir.ui.view">
+            <field name="name">Sale.order.done.filter</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+            <field name="arch" type="xml">
+        
+                <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                    <separator/>
+                    <filter string="DO Belum Lunas" name="belum_lunas" domain="[('is_done','=',False)]"/>
+                    <filter string="DO Lunas" name="lunas" domain="[('is_done','!=',False)]"/>
+                </xpath>
+                    
+            </field>
+        </record>
+
+        <!-- Quotation Form -->
+        <!-- <record id="quot_custom_form" model="ir.ui.view" >
+            <field name="name">quot_custom_form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="payment_term_id" position="after">
+                    <field name="dicek" attrs="{'invisible': [('is_order','=',True)]}" string="Sudah dicek?"/>
+                </field>
+                <field name="date_order" position="after">
+                    <field name="kalk_date"/>
+                </field>
+
+                <field name="note" position="attributes">
+                    <attribute name="placeholder"></attribute>
+                </field>
+                <field name="note"/>
+            </field>
+        </record> -->
+
+        <!-- Treeview -->
+        <!-- <record model="ir.ui.view" id="quot_custom_tree">
+            <field name="name">quot_custom_tree</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="tag_ids" />
+                </xpath>
+                <xpath expr="//field[@name='state']" position="after">
+                    <field name="dicek" string="Sudah dicek?"/>
+                </xpath>
+            </field>
+        </record> -->
+
+        <!-- invoice line form -->
+        <!-- <record model="ir.ui.view" id="custom_sale_order_line">
+            <field name="name">custom_sale_order_line</field>
+            <field name="model">account.invoice.line</field>
+            <field name="inherit_id" ref="account.view_invoice_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="specification"/>
+                </xpath>
+
+            </field>
+        </record> -->
+
+        <!-- invoice line form -->
+        <!-- <record model="ir.ui.view" id="custom_sale_order_line">
+            <field name="name">custom_sale_order_line</field>
+            <field name="model">account.invoice.line</field>
+            <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//label[@for='name']" position="before">
+                    <label for="specification"/>
+                    <field name="specification"/>
+                </xpath>
+
+            </field>
+        </record> -->
+
+    </data>
+</odoo>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <report
+            id="report_inv" 
+            model="account.move"
+            string="Invoice PP" 
+            report_type="qweb-html"
+            name="pp_application.inv_report"
+            file="pp_application.inv_report"/>
+
+        <record id="paperformat_inv" model="report.paperformat">
+            <field name="name">Inv PP</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">0</field>
+            <field name="margin_bottom">4</field>
+            <field name="margin_left">3</field>
+            <field name="margin_right">3</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">100</field>
+        </record>
+
+        <record id="pp_application.report_inv" model="ir.actions.report">
+            <field name="paperformat_id" ref="pp_application.paperformat_inv"/>
+            <field name="print_report_name">('INV_PP_'+(object.name or '').replace('/','')+'.pdf')</field>
+        </record>
+    
+    </data>
+    
+
+</odoo>

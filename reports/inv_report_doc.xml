@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<odoo>
+        <template id="pp_application.inv_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="pp_application.inv_report_doc" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+        <template id="pp_application.inv_report_doc">
+            <t t-name="pp_application.inv_report_doc">
+
+                <t t-call="web.external_layout">
+                    <t t-set="doc" t-value="doc.with_context(lang=lang)"/>
+
+                    <div class="page" style="font-family: Consolas; font-size: 14px !important;">
+                    
+                        <div class="oe_structure"/>
+                        
+                        <div class="row mt32 mb32">
+                            <div class="col-8">
+                                <div class="col-4 pull-left" name="company_address">
+                                    <b><span style="font-size: 16px !important;">CV. Prima Print</span></b>
+                                    <br/>
+                                    <span>Jl. Petemon III No.52</span>
+                                    <br/>
+                                    <span>Surabaya 60252</span>
+                                </div>
+                            </div>
+                            <div class="col-4 pull-right">
+                                <span><strong>Customer Address :</strong></span><br/>
+                                <address t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True}"/>
+                                <span t-if="doc.partner_id.vat">TIN: <span t-field="doc.partner_id.vat"/></span>
+                                
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mt-6 mb-6">
+                                <br/><br/>
+                                <h5 class="consola-font"><strong>
+                                    <span t-if="doc.move_type == 'out_invoice' and doc.state == 'posted'">Invoice</span>
+                                    <span t-if="doc.move_type == 'out_invoice' and doc.state == 'draft'">Draft Invoice</span>
+                                    <span t-if="doc.move_type == 'out_invoice' and doc.state == 'cancel'">Cancelled Invoice</span>
+                                    <span t-if="doc.move_type == 'out_refund'">Credit Note</span>
+                                    <span t-if="doc.move_type == 'in_refund'">Vendor Credit Note</span>
+                                    <span t-if="doc.move_type == 'in_invoice'">Vendor Bill</span>
+                                    <span t-if="doc.move_type != '/'" t-field="doc.name"/>
+                                
+                                </strong></h5>
+                                <br/>
+                            </div>
+                        </div>
+
+                        <div class="row mb-6">
+                            <div class="col-3" t-if="doc.name">
+                                <!-- <strong>No Nota:</strong> -->
+                                <span>Ref No:</span>
+                                <p t-field="doc.name"/>
+                            </div>
+                            <div class="col-3" t-if="doc.invoice_date">
+                                <!-- <strong>Invoice Date:</strong> -->
+                                <span>Invoice Date:</span>
+                                <p t-field="doc.invoice_date"/>
+                            </div>
+                            <div class="col-3" t-if="doc.invoice_payment_term_id and doc.move_type == 'out_invoice' and (doc.state == 'open' or doc.state == 'paid')">
+                                <!-- <strong>Due Date:</strong> -->
+                                <span>Due Date:</span>
+                                <p t-field="doc.invoice_payment_term_id"/>
+                            </div>
+                            <div class="col-3" t-if="doc.invoice_origin">
+                                <!-- <strong>Source:</strong> -->
+                                <span>Source:</span>
+                                <p t-field="doc.invoice_origin"/>
+                            </div>
+                            <div name="reference" class="col-3" t-if="doc.ref">
+                                <!-- <strong>No Nota:</strong> -->
+                                <span>No Nota:</span>
+                                <p t-field="doc.ref"/>
+                            </div>
+                        </div>
+
+                        <t t-set="display_discount" t-value="any([l.discount for l in doc.invoice_line_ids])"/>
+                            <br/>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th style="font-weight: normal;">Code</th>
+                                        <th style="font-weight: normal;">Description</th>
+                                        <th style="font-weight: normal;">Category</th>
+                                        <th style="font-weight: normal;" class="text-right">Quantity</th>
+                                        <th style="font-weight: normal;" class="text-right">Unit Price</th>
+                                        <th t-if="display_discount" style="font-weight: normal;" class="text-right">Disc.(%)</th>
+                                        <th style="font-weight: normal;" class="text-right">Taxes</th>
+                                        <th style="font-weight: normal;" class="text-right">Tax Excluded Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="invoice_tbody">
+                                    <tr t-foreach="doc.invoice_line_ids" t-as="l">
+                                        <td style="border: none;">
+                                            <t t-if="l.product_id.produk_code">
+                                                <span t-field="l.product_id.produk_code"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span>-</span>
+                                            </t>
+                                        </td>
+                                        <td style="border: none;"><span t-field="l.name"/></td>
+                                        <td style="border: none;">
+                                            <t t-if="l.product_id.categ_id.name != 'Product Lainnya'">
+                                                <span t-field="l.product_id.categ_id.name"/>    
+                                            </t>
+                                            <t t-if="l.product_id.categ_id.name == 'Product Lainnya'">
+                                                <span>Lainnya</span>    
+                                            </t>
+                                        </td>
+                                        <td style="border: none;" class="text-right">
+                                            <span t-field="l.quantity"/> pcs
+                                            <span t-field="l.uom_id" groups="product.group_uom"/>
+                                        </td>
+                                        <td style="border: none;" class="text-right">
+                                            <span t-field="l.price_unit"/>
+                                        </td>
+                                        <td style="border: none;" t-if="display_discount" class="text-right">
+                                            <span t-field="l.discount"/>
+                                        </td>
+                                        <td style="border: none;" class="text-right">
+                                            <span t-field="l.tax_ids"/>
+                                        </td>
+                                        <td style="border: none;" class="text-right">
+                                            <!-- <span t-field="l.price_subtotal"  t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;'display_currency'&quot;: l.pricelist_id.currency_id}"/> -->
+                                            
+                                            <span t-field="l.price_subtotal" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row">
+                                <div class="col-8" style="margin-top:-5px !important;">
+                                    <table class="table table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th style="font-weight: normal;" width="50%">No. SJ</th>
+                                                <th style="font-weight: normal;" width="50%">Tracker References</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="font-size:14px;">
+                                            <tr>
+                                                <td>
+                                                    <t t-foreach="request.env['stock.picking'].search([])" t-as="picking">
+                                                        <t t-if="doc.invoice_origin == picking.origin">
+                                                            <span t-field="picking.name"/>
+                                                        </t>
+                                                    </t>
+                                                    <!-- <t t-if="doc.invoice_origin == picking.origin">
+                                                        <span t-field="picking.name"/>
+                                                    </t> -->
+                                                </td>
+                                                <td>
+                                                    <t t-foreach="request.env['stock.picking'].search([])" t-as="pickings">
+                                                        <t t-if="doc.invoice_origin == pickings.origin">
+                                                            <span><t t-esc="pickings.carrier_tracking_ref"/></span>
+                                                        </t>
+                                                    </t>
+                                                    <!-- <span><t t-esc="picking.carrier_tracking_ref"/></span> -->
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-4 pull-right" style=" margin-top:-5px !important;">
+                                    <table class="table table-condensed">
+                                        <tr class="border-black">
+                                            <!-- <td><strong>Total Without Taxes</strong></td> -->
+                                            <td><span>Subtotal</span></td>
+                                            <td class="text-right">
+                                                <span t-field="doc.amount_untaxed"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><span>Taxes</span></td>
+                                            <td class="text-right">
+                                                <span t-esc="doc.amount_tax"/>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-black">
+                                            <!-- <td><strong>Total</strong></td> -->
+                                            <td><span>Total</span></td>
+                                            <td class="text-right">
+                                                <span t-field="doc.amount_total" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div name="invoice_address" class="col-8">
+                                    <span><strong>Note:</strong></span><br/>
+                                    <span t-field="doc.narration"/><br/><br/>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            <div class="row">
+                                <div class="col-8"></div>
+                                <div class="col-4 pull-right" style="margin-top:-5px !important;">
+                                <br/><br/>
+                                    <table>
+                                        <tr>
+                                            <td width="5px"/>
+                                            <td width="150px" align="center"><small>Regards,</small></td>
+                                            <td width="5px"/>
+                                        </tr>
+                                        <tr>
+                                            <td> 
+                                                <br/><br/><br/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><small>(</small></td>
+                                            <td align="center" style="font-size: 14px !important;"><small>....................</small></td>
+                                            <td><small>)</small></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        
+                        
+                        <div class="oe_structure"/>
+                    
+                    </div>
+                </t>
+            </t>
+        </template>
+
+</odoo>

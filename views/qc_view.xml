@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <!-- FormView QC -->
+        <record model="ir.ui.view" id="qc_custom_form_view">
+            <field name="name">qc_custom_form_view</field>
+            <field name="model">qc.inspection</field>
+            <field name="inherit_id" ref="quality_control_oca.qc_inspection_form_view"/>
+            <field name="arch" type="xml">
+                <field name="auto_generated" position="after">
+					<field name="jenis_kertas" />
+					<field name="grammatur" />
+					<field name="panjang" />
+					<field name="lebar" />
+					<field name="tinggi" />
+				</field>
+				<field name="product_id" position="before">
+					<field name="qty_bundle" />
+				</field>
+                <field name="object_id" position="after">
+                    <field name="so_ref" />
+                    <field name="product_ref" string="Product Reference" />
+                    <field name="description" />
+                </field>
+                <field name="object_id" position="attributes">
+                    <attribute name="attrs">{"readonly":[["state","not in",["draft","ready","waiting","success"]]]}</attribute>
+                </field>
+                <field name="product_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="production_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="lot_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="qty" position="attributes">
+                    <attribute name="string">Qty Kirim</attribute>
+                </field>
+                <field name="qty" position="after">
+                    <field name="qty_sample" />
+                </field>
+
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="qc_inspection_treeview_custom">
+            <field name="name">qc.inspection.treeview.custom</field>
+            <field name="model">qc.inspection</field>
+            <field name="inherit_id" ref="quality_control_oca.qc_inspection_tree_view"/>
+            <field name="arch" type="xml">
+    
+            <xpath expr="//field[@name='qty']" position="attributes">
+                <attribute name="string">Qty kirim (pcs)</attribute>
+            </xpath>
+
+            <field name="name" position="after">
+                <field name="date" />
+            </field>
+            <field name="production_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="lot_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="product_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="qty" position="before">
+                <field name="so_ref" string="SO ref." />
+                <field name="product_ref" string="Product ref." />
+                <field name="description" string="Description" />
+            </field>
+            <field name="qty" position="after">
+                <field name="qty_sample" string="Qty sample (pcs)" />
+            </field>
+
+            </field>
+        </record>
+    
+    </data>
+    
+
+</odoo>

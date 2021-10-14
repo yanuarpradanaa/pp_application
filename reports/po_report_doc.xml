@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<odoo>
+        <template id="pp_application.po_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="pp_application.po_report_doc" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+        <template id="pp_application.po_report_doc">
+            <t t-name="pp_application.po_report_doc">
+
+                <t t-call="web.external_layout">
+                    <t t-set="doc" t-value="doc.with_context(lang=lang)"/>
+
+                    <div class="page" style="font-family: Consolas; font-size: 14px !important;">
+                    
+                        <div class="oe_structure"/>
+                        
+                        <div class="row">
+                            <div class="col-4 pull-left" name="company_address">
+                                <span>CV. Prima Print</span>
+                                <br/>
+                                <span>Jl. Petemon III No.52</span>
+                                <br/>
+                                <span>Surabaya 60252</span>
+                            </div>
+                        </div><br/><br/><br/>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-6">
+                                <span><strong>Shipping address :</strong></span>
+                                <div t-if="doc.dest_address_id">
+                                    <div t-field="doc.dest_address_id"
+                                        t-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": True}'/> <!-- , "phone_icons": True -->
+                                </div>
+
+                                <div t-if="not doc.dest_address_id and doc.picking_type_id and doc.picking_type_id.warehouse_id">
+                                    <span t-field="doc.picking_type_id.warehouse_id.name"/>
+                                    <div t-field="doc.picking_type_id.warehouse_id.partner_id"
+                                        t-options='{"widget": "contact", "fields": ["address", "phone", "fax"], "no_marker": True}'/> <!-- , "phone_icons": True -->
+                                </div>
+                            </div>
+                            <div class="col-6 pull-right">
+                                <address t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True}"/>
+                                <span t-if="doc.partner_id.vat">TIN: <span t-field="doc.partner_id.vat"/></span>
+                                
+                            </div>
+                        </div>
+
+                        <br/>
+                        <h3 t-if="doc.state != 'draft'">PO Confirmation #<span t-field="doc.name"/></h3>
+                        <h3 t-if="doc.state == 'draft'">Request for Quotation #<span t-field="doc.name"/></h3>
+
+                        <div class="row mt32 mb32">
+                            <div t-if="doc.name" class="col-3">
+                                <!-- <strong>Our Order Reference:</strong> -->
+                                <span>Our Order Reference:</span>
+                                <p t-field="doc.name"/>
+                            </div>
+                            <div t-if="doc.partner_ref" class="col-3">
+                                <!-- <strong>Your Order Reference</strong> -->
+                                <span>Your Order Reference</span>
+                                <p t-field="doc.partner_ref"/>
+                            </div>
+                            <div t-if="doc.date_order" class="col-3">
+                                <!-- <strong>Order Date:</strong> -->
+                                <span>Order Date:</span>
+                                <p t-field="doc.date_order" widget="date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th style="font-weight: normal;">Description</th>
+                                    <th style="font-weight: normal;">Taxes</th>
+                                    <th style="font-weight: normal;" class="text-center">Date Req.</th>
+                                    <th style="font-weight: normal;" class="text-right">Qty</th>
+                                    <th style="font-weight: normal;" class="text-right">Unit Price</th>
+                                    <th style="font-weight: normal;" class="text-right">Net Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.order_line" t-as="line">
+                                    <td style="border: none;">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td style="border: none;">
+                                        <span t-esc="', '.join(map(lambda x: x.name, line.taxes_id))"/>
+                                    </td>
+                                    <td style="border: none;" class="text-center">
+                                        <span t-field="line.date_planned" widget="date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                                    </td>
+                                    <td style="border: none;" class="text-right">
+                                        <span t-field="line.product_qty"/>
+                                        <span t-field="line.product_uom.name"/>
+                                    </td>
+                                    <td style="border: none;" class="text-right">
+                                        <span t-field="line.price_unit"/>
+                                    </td>
+                                    <td style="border: none;" class="text-right">
+                                        <span t-field="line.price_subtotal"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-8"></div>
+                            <div class="col-4 pull-right">
+                                <table class="table table-condensed">
+                                    <tr class="border-black">
+                                        <!-- <td><strong>Total Without Taxes</strong></td> -->
+                                        <td>Total Without Taxes</td>
+                                        <td class="text-right">
+                                            <span t-field="doc.amount_untaxed"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Taxes</td>
+                                        <td class="text-right">
+                                            <span t-field="doc.amount_tax"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-black">
+                                        <td>Total</td>
+                                        <td class="text-right">
+                                            <span t-field="doc.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div><br/><br/>
+
+                        <div class="row">
+                        
+                            <div class="col-8">
+                                <span t-if="doc.notes"><strong>Note:</strong></span><br/>
+                                <span t-field="doc.notes"/><br/><br/>
+                            </div>
+                            <div class="col-4 pull-right">
+                            <table>
+                                <tr><td width="5px"/>
+                                        <td width="150px" align="center">CV Prima Print,</td>
+                                        <td width="5px"/>
+                                </tr>
+                                <tr><td> <br/><br/><br/><br/></td></tr>
+                                <tr><td>(</td>
+                                        <td align="center" style="font-size: 14px !important;">......................</td>
+                                        <td>)</td>
+                                </tr>
+                            </table>
+                            </div>
+                            
+                        </div>
+
+                        
+
+                        <div class="oe_structure"/>
+                    
+                    </div>
+                </t>
+            </t>
+        </template>
+
+</odoo>

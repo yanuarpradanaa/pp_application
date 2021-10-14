@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<odoo>
+        <template id="pp_application.do_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="pp_application.do_report_doc" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+
+        <template id="report_assets_common_custom_fonts" name="Custom QWeb fonts" inherit_id="web.report_assets_common">
+                <xpath expr="." position="inside">
+                    <link href="/pp_application/static/src/less/fonts.less" rel="stylesheet" type="text/less"/>
+                </xpath>
+        </template>
+
+        <template id="pp_application.do_report_doc">
+            <t t-name="pp_application.do_report_doc">
+
+                <t t-call="web.internal_layout">
+                    <t t-set="doc" t-value="doc.with_context(lang=lang)"/>
+
+                    <div class="page" style="font-family: Consolas; font-size: 14px !important;">
+                    
+                        <div class="oe_structure"/>
+                        
+                        <div class="row mt32 mb32">
+                            <div class="col-8" name="company_address">
+                                <!-- <span>CV. Prima Print</span>
+                                <br/>
+                                <span>Jl. Petemon III No.52</span>
+                                <br/>
+                                <span>Surabaya 60252</span> -->
+                                <div t-if="doc.picking_type_id.code=='outgoing' and doc.partner_id">
+                                    <!-- <span><strong>Warehouse Address:</strong></span> -->
+                                    <div t-field="doc.picking_type_id.warehouse_id.partner_id" t-options='{"widget": "contact", "fields": ["address", "name", "phone","fax"], "no_marker": True}'/> <!-- , "phone_icons": True -->
+                                </div>
+                            </div>
+                            <div class="col-4 pull-right">
+                                <div t-if="doc.picking_type_id.code=='incoming' and doc.partner_id">
+                                    <!-- <span><strong>Vendor Address:</strong></span> -->
+                                    <span><strong>Vendor Address:</strong></span>
+                                </div>
+                                <div t-if="doc.picking_type_id.code=='internal' and doc.partner_id">
+                                    <!-- <span><strong>Warehouse Address:</strong></span> -->
+                                    <span><strong>Warehouse Address:</strong></span>
+                                </div>
+                                <div t-if="doc.picking_type_id.code=='outgoing' and doc.partner_id">
+                                    <!-- <span><strong>Customer Address:</strong></span> -->
+                                    <span><strong>Customer Address:</strong></span>
+                                </div>
+                                <div t-if="doc.partner_id" name="partner_header" >
+                                    <div col-span="4" t-field="doc.partner_id" t-options='{"widget": "contact", "fields": ["name","address"], "no_marker": True}'/> <!-- , "phone_icons": True -->
+                                    <p t-if="doc.sudo().partner_id.vat">VAT: <span t-field="doc.sudo().partner_id.vat"/></p>
+                                </div>
+                                <!-- <address t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True}"/>
+                                <span t-if="doc.partner_id.vat">TIN: <span t-field="doc.partner_id.vat"/></span> -->
+                                
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-5 mb-2" style="margin-top:5px !important;">
+                                <h3 class="consola-font"><strong>
+                                    <br/>
+                                    <span t-field="doc.name"/>
+                                </strong></h3>
+                            </div>
+                        </div>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th t-if="doc.origin" style="font-weight: normal;">Order (Origin)</th>
+                                    <th style="font-weight: normal;">State</th>
+                                    <th style="font-weight: normal;">Commitment Date</th>
+                                    <th style="font-weight: normal;">No. Surat Jalan</th>
+                                    <th style="font-weight: normal;">Po No</th>
+                                </tr>
+                            </thead>
+                            <tbody class="invoice_tbody">
+                                <tr>
+                                    <td t-if="doc.origin">
+                                        <span t-field="doc.origin"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.state"/>
+                                    </td>
+                                    <!-- <td>
+                                        <span t-field="o.date" t-field-options="{'format': 'dd/MM/yyyy'}"/>
+                                    </td> -->
+                                    <td name="td_sched_date">
+                                        <span t-field="doc.scheduled_date" t-options="{'format': 'dd/MM/yyyy'}"/>
+                                    </td>
+                                    <td>
+                                        <span t-field="doc.carrier_tracking_ref"/>
+                                    </td>
+
+                                    <td>
+                                        <t t-foreach="request.env['sale.order'].search([])" t-as="s">
+
+
+                                        <t t-if="doc.origin == s.name ">
+                                        <span t-field="s.client_order_ref"/>
+                                        </t>
+
+                                        </t>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+
+                                    <th style="font-weight: normal;">Description</th>
+
+                                    <th style="font-weight: normal;" >Category</th>
+
+                                    <!-- <th class="text-right"><strong>Quantity</strong></th> -->
+                                    <th style="font-weight: normal;">Quantity</th>
+
+                                    <!-- <t t-if="o.picking_type_id.code != 'incoming'"><th><strong>Source</strong></th></t> -->
+                                    <t t-if="doc.picking_type_id.code != 'incoming'">
+                                        <th style="font-weight: normal;">
+                                            Source
+                                        </th>
+                                    </t>
+
+                                    <th t-if="barcode" style="font-weight: normal;">
+                                        <!-- <strong>Barcode</strong> -->
+                                        Barcode
+                                    </th>
+                                    <th t-if="lot_id" style="font-weight: normal;">
+                                        <!-- <strong>Lot/Serial Number</strong> -->
+                                        Lot/Serial Number
+                                    </th>
+                                    <t t-if="doc.picking_type_id.code != 'outgoing'" style="font-weight: normal;">
+                                        <th>
+                                            <!-- <strong>Destination</strong> -->
+                                            Destination
+                                        </th>
+                                    </t>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <tr t-foreach="doc.move_ids_without_package" t-as="pack_operation">
+
+                                    <!-- Description -->
+                                    <td style="border: none;">
+                                        <span t-field="pack_operation.product_id"/> 
+                                        
+                                    </td>
+
+                                        <!-- Category -->
+                                    <td style="border: none;" >
+                                        <span t-field="pack_operation.product_id.categ_id.name"/> 
+                                    </td>
+
+
+                                    <!-- Quantity -->
+                                    <td style="border: none;">
+                                        <span t-field="pack_operation.product_qty"/> 
+                                        <span t-field="pack_operation.product_uom"/>
+                                    </td>
+
+                                    <!-- Source -->
+                                    <t t-if="doc.picking_type_id.code != 'incoming'">
+                                        <td style="border: none;">
+                                            <span t-field="pack_operation.location_id"/>
+                                        </td>
+                                    </t>
+
+                                    <!-- Barcode -->
+                                    <td style="border: none;" t-if="has_barcode">
+                                        <span t-field="pack_operation.product_id.barcode"/>
+                                    </td>
+
+                                    <!-- Lot/Serial Number -->
+                                    <td style="border: none;" t-if="has_serial_number">
+                                        <span t-field="pack_operation.product_id.lot_id"/>
+                                    </td>
+
+                                    <!-- Destination -->
+                                    <t style="border: none;" t-if="doc.picking_type_id.code != 'outgoing'">
+                                        <td>
+                                            <span t-field="pack_operation.location_dest_id"/>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                        <p t-field="doc.note"/>
+                            <div class="row" style="margin:0px 15px 5px 15px" >
+                                <div class="col-8">
+                                    <table>
+                                        <tr><td width="5px"/>
+                                            <td width="150px" align="center">Receiver,</td>
+                                            <td width="5px"/>
+                                        </tr>
+                                        <tr><td><br/><br/></td></tr>
+                                        <tr><td>(</td>
+                                            <td align="center" style="font-size: 14px !important;">.................</td>
+                                            <td>)</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div class="col-4 pull-right">
+                                    <table>
+                                        <tr><td width="5px"/>
+                                            <td width="150px" align="center">CV Prima Print,</td>
+                                            <td width="5px"/>
+                                        </tr>
+                                        <tr><td><br/><br/></td></tr>
+                                        <tr><td>(</td>
+                                            <td align="center" style="font-size: 14px !important;">.................</td>
+                                            <td>)</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <p t-if="doc.state in ['draft', 'waiting', 'confirmed']">
+                                You do not have any products reserved for this picking.  Please click the 'Reserve' button to check if products are available.
+                            </p>
+
+                        
+                        <div class="oe_structure"/>
+                    
+                    </div>
+                </t>
+            </t>
+        </template>
+
+</odoo>
